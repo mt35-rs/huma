@@ -60,10 +60,10 @@ func (c *oaComponents) AddSchema(t reflect.Type, mode schema.Mode, hint string, 
 
 func (c *oaComponents) addSchema(t reflect.Type, mode schema.Mode, hint string, generateSchemaField bool) string {
 	// Try to determine the type's name.
-	name := t.Name()
+	name := schema.SchemaName(t)
 	if name == "" && t.Kind() == reflect.Ptr {
 		// Take the name of the pointed-to type.
-		name = t.Elem().Name()
+		name = schema.SchemaName(t.Elem())
 	}
 	if name == "" && t.Kind() == reflect.Slice {
 		// Take the name of the type in the array and append "List" to it.

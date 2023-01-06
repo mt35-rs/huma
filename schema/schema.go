@@ -445,6 +445,18 @@ func GenerateFromField(f reflect.StructField, mode Mode, definedRefs map[string]
 	return name, optional, s, nil
 }
 
+func SchemaName(t reflect.Type) string {
+	path := strings.ReplaceAll(t.PkgPath(), "/", "$")
+	return fmt.Sprintf(`%s.%s`, path, t.Name())
+}
+
+// The `NestedSchemaReference` type is used to track references to
+// struct field types.  To avoid recursion, these are not elaborated
+// inline but instead replaced with references (`$ref`).  When generating
+// the OpenAPI specification, a map of such references is passed in
+// to record all such references so that each individual schema that
+// was referenced is elaborated properly within the OpenAPI schema
+// (since they are not elaborated inline).
 type NestedSchemaReference struct {
 	Name string
 	Ref  string
@@ -477,7 +489,7 @@ func GenerateWithMode(t reflect.Type, mode Mode, schema *Schema, definedRefs map
 			return &Schema{Type: TypeString, Format: "uri"}, nil
 		}
 
-		tname := t.Name()
+		tname := SchemaName(t)
 		if tname != "" {
 			ref, exists := definedRefs[tname]
 			if exists {

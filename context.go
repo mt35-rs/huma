@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/negotiation"
+	"github.com/danielgtaylor/huma/schema"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/goccy/go-yaml"
 )
@@ -312,7 +313,7 @@ func (c *hcontext) writeModel(ct string, status int, model interface{}) {
 			if r.status == status || r.status == 0 {
 				responses = append(responses, r)
 				if r.model != nil {
-					names = append(names, r.model.Name())
+					names = append(names, schema.SchemaName(r.model))
 				}
 			}
 		}
@@ -337,7 +338,7 @@ func (c *hcontext) writeModel(ct string, status int, model interface{}) {
 		// Some automatic responses won't be registered but will have an error model
 		// returned. We should support these as well.
 		if modelType == reflect.TypeOf(&ErrorModel{}) {
-			modelRef = c.schemasPath + "/" + modelType.Elem().Name()
+			modelRef = c.schemasPath + "/" + schema.SchemaName(modelType.Elem())
 		}
 	}
 
